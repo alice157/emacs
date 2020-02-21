@@ -1,0 +1,87 @@
+#+PROPERTY: header-args :tangle yes
+
+cljstyle a buffer
+#+begin_src emacs-lisp
+  ;; Thanks Jeff!
+  (defun cljstyle-current-file ()
+    (interactive)
+    (unless (executable-find "cljstyle")
+      (error "Could not locate executable cljstyle"))
+    (save-buffer)
+    (shell-command
+     (concat "cljstyle fix " buffer-file-name)
+     "*cljstyle*")
+    (message "Formatted buffer with cljstyle.")
+    (revert-buffer))
+
+  (defun cljstyle-region (start end)
+    (interactive "r")
+    (unless (executable-find "cljstyle")
+      (error "Could not locate executable cljstyle"))
+    (if (use-region-p)
+        (shell-command-on-region start end (concat (executable-find "cljstyle") " pipe") nil 't "*cljstyle error*" nil nil)
+      (shell-command-on-region (point-min) (point-max) (concat (executable-find "cljstyle") " pipe") nil 't "*cljstyle error*" nil nil)))
+#+end_src
+
+Hydras/Cider config
+#+BEGIN_SRC emacs-lisp
+  (use-package clojure-mode)
+  (use-package cider
+    :after (clojure-mode hydra))
+  (require 'cider)
+  (setq cider-repl-pop-to-buffer-on-connect 'display-only)
+  (major-mode-hydra-define (clojure-mode clojurescript-mode clojurec-mode) (:title "Clojure" :quit-key "q")
+    ("REPL"
+     (("'" cider-jack-in "jack in clj")
+      (", '" cider-jack-in-cljs "jack in cljs") ; smartparens doesn't seem to like double quotes ;-;
+      ("s c" cider-repl-clear-output "clear repl output")
+      ("s q" cider-quit "quit repl")
+      ("s i" cider-interrupt "interrupt"))
+     "Evaluation"
+     (("e b" cider-eval-buffer "eval buffer")
+      ("e e" cider-eval-last-sexp "eval last sexp")
+      ("e v" cider-eval-last-sexp-and-replace "eval last sexp and replace")
+      ("e f" cider-eval-defun-at-point "eval defun at point")
+      ("e r" cider-eval-region "eval region")
+      ("e n" cider-eval-ns-form "eval ns form")
+      ("e m" cider-macroexpand-1 "macroexpand-1")
+      ("e M" cider-macroexpand-all "macroexpand all"))
+     "Documentation"
+     (("h a" cider-apropos "apropos")
+      ("h h" cider-doc "doc")
+      ("h j" cider-javadoc "javadoc")
+      ("h n" cider-browse-ns "browse namespace")
+      ("h N" cider-browse-ns-all "browse all namespaces"))
+     "Jump"
+     (("g g" (lambda (p) (interactive "P") (cider-find-var (if p nil (list 4)))) "find var")
+      ("g b" cider-pop-back "pop back"))
+     "Refactor"
+     (("r s" cljstyle-region "cljstyle region")
+      ("r S" cljstyle-current-file "cljstyle current file"))
+     "Test"
+     (("t a" cider-test-run-ns-tests "run ns tests")
+      ("t r" cider-test-show-report "show test report")
+      ("t A" cider-auto-test-mode "toggle auto test mode")
+      ("t f" cider-test-rerun-failed-tests "rerun failed tests"))
+     "Config"
+     ((", e" (lambda () (interactive) (find-file-other-window "~/.emacs.d/modes/lisp/clojure.org")) "edit mode config"))))
+
+  (major-mode-hydra-define cider-repl-mode (:title "Cider REPL" :quit-key "q")
+    ("REPL"
+     (("s q" cider-quit "quit repl")
+      ("s c" cider-repl-clear-buffer "clear buffer")
+      ("s C" cider-repl-clear-output "clear output")
+      ("s i" cider-interrupt "interrupt"))
+     "Documentation"
+     (("h a" cider-apropos "apropos")
+      ("h h" cider-doc "doc")
+      ("h j" cider-javadoc "javadoc")
+      ("h n" cider-browse-ns "browse namespace")
+      ("h N" cider-browse-ns-all "browse all namespaces"))
+     "Config"
+     ((", e" (lambda () (interactive) (find-file-other-window "~/.emacs.d/modes/lisp/clojure.org")) "edit mode config"))))
+
+  (major-mode-hydra-define cider-inspector-mode (:title "Cider Inspector" :quit-key "q")
+    ("View"
+     (("r" cider-inspector-refresh "refresh"))))
+#+END_SRC

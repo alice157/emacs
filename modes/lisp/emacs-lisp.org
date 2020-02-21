@@ -1,0 +1,13 @@
+#+PROPERTY: header-args :tangle yes
+#+begin_src emacs-lisp
+  (major-mode-hydra-define (emacs-lisp-mode) (:title "Emacs Lisp" :quit-key "q")
+    ("Goto"
+     (("g g" xref-find-definitions-other-window "find definition"))
+     "Eval"
+     (("e e" eval-last-sexp "eval last sexp")
+      ("e f" eval-defun "eval defun")
+      ("e b" eval-buffer "eval buffer")
+      ("e r" eval-region "eval region"))
+    "Config"
+    ((", e" (lambda () (interactive) (find-file "~/.emacs.d/modes/lisp/emacs-lisp.org")) "edit emacs-lisp config"))))
+#+end_src

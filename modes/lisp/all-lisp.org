@@ -1,0 +1,90 @@
+#+PROPERTY: header-args :tangle yes
+* all-lisp.org
+
+This org file contains everything common to all lisp modes, and loads all the language specific files in this directory.
+
+** Hook definitions
+#+begin_src emacs-lisp :tangle yes
+  (require 'org)
+  (require 'clojure-mode)
+  (setq alice157/all-lisp/hooks '(emacs-lisp-mode-hook clojure-mode-hook))
+#+end_src
+
+** Structural editing
+
+*** Aggressive-indent-mode   
+Aggressive indenting for all
+
+#+begin_src emacs-lisp
+  (use-package aggressive-indent)
+#+end_src
+*** Smartparens
+Include =smartparens= for structural editing.
+
+#+begin_src emacs-lisp
+  (use-package smartparens
+    :hook
+    (alice157/all-lisp/hooks . smartparens-strict-mode)
+    (alice157/all-lisp/hooks . show-smartparens-mode)
+    :config
+    (show-smartparens-global-mode 1))
+    (evil-define-key 'insert 'global (kbd "DEL") 'sp-backward-delete-char)
+#+end_src
+
+*** Evil-cleverparens
+Use =evil-cleverparens= to make smartparens play nicer with =evil-mode=.
+
+#+begin_src emacs-lisp
+  (use-package evil-cleverparens
+    :hook
+    (alice157/all-lisp/hooks . evil-cleverparens-mode)
+    :config
+    (setq evil-move-beyond-eol t))
+#+end_src
+
+*** Structural hydra
+~Stealing~ Borrowing the lisp-state idea from spacemacs, but make it hydra.
+
+#+BEGIN_SRC emacs-lisp
+  (require 'hydra)
+  (require 'evil)
+  (require 'pretty-hydra)
+
+  (pretty-hydra-define hydra-lisp-state-kill
+    (:color blue :quit-key "q")
+    ("Kill"
+      (("x" sp-kill-sexp "kill sexp")
+       ("w" sp-kill-word "kill word"))))
+
+  (pretty-hydra-define hydra-lisp-state
+    (:color blue :quit-key "q")
+    ("Slurp/Barf"
+      (("s" sp-forward-slurp-sexp "slurp forward" :color red)
+       ("S" sp-backward-slurp-sexp "slurp backward" :color red)
+       ("b" sp-forward-barf-sexp "barf forward" :color red)
+       ("B" sp-backward-barf-sexp "barf backward" :color red))
+     "Movement"
+       (("h" sp-backward-sexp "previous sexp" :color red)
+        ("j" sp-up-sexp "up sexp" :color red)
+        ("k" sp-down-sexp "down sexp" :color red)
+        ("l" sp-forward-sexp "next sexp" :color red))
+     "Structure"
+       (("r" sp-raise-sexp "raise sexp" :color red)
+        ("w" sp-wrap-round "wrap sexp" :color red)
+        ("W" sp-unwrap-sexp "unwrap sexp" :color red)
+        ("v" (lambda () (interactive) (call-interactively 'sp-select-next-thing) (call-interactively 'evil-backward-char)) "select next thing" :color red))
+     "Yank/kill"
+       (("d" hydra-lisp-state-kill/body "kill" :color blue)
+       ("y" sp-copy-sexp "copy" :color blue))))
+  (evil-define-key 'normal 'global (kbd "SPC k") 'hydra-lisp-state/body)
+#+END_SRC
+
+*** Load languages
+Clojure
+#+begin_src emacs-lisp
+  (org-babel-load-file (expand-file-name "modes/lisp/clojure.org" user-emacs-directory))
+#+end_src
+Emacs lisp
+#+begin_src emacs-lisp
+  (org-babel-load-file (expand-file-name "modes/lisp/emacs-lisp.org" user-emacs-directory))
+#+end_src

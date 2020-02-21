@@ -1,0 +1,53 @@
+#+PROPERTY: header-args :tangle yes
+
+* Config
+
+#+begin_src emacs-lisp
+  (require 'org)
+  (setq org-agenda-files (list "~/notes/misc.org"))
+
+  (setq org-catch-invisible-edits 'smart)
+#+end_src
+
+* Keybindings
+
+** Global
+#+begin_src emacs-lisp
+  (require 'org)
+  (setq org-log-done t)
+  (evil-define-key 'normal 'global
+    (kbd "SPC O l") 'org-store-link
+    (kbd "SPC O a") 'org-agenda)
+#+end_src
+
+** org-mode
+
+ Movement hydra
+ #+begin_src emacs-lisp
+ (pretty-hydra-define hydra-org-movement
+   (:title "Org movement" :quit-key "q" :color red)
+   ("Headings"
+    (("h" org-backward-heading-same-level "previous (same level)")
+     ("j" org-next-visible-heading "next")
+     ("k" org-previous-visible-heading "previous")
+     ("l" org-forward-heading-same-level "next (same level)")
+     ("u" outline-up-heading "up")
+     ("g" org-goto))))
+ #+end_src
+ Major mode hydra
+
+ #+begin_src emacs-lisp
+ (major-mode-hydra-define (org-mode) (:title "Org" :quit-key "q")
+   ("Todo"
+    (("t t" org-todo "todo")
+     ("t s" org-schedule "schedule"))
+    "Insert"
+    (("i t" org-insert-todo-heading "insert todo heading")
+     ("i l" org-insert-link "insert link"))
+    "Misc"
+    (("b" org-toggle-checkbox "toggle checkbox")
+     ("k" hydra-org-movement/body "navigate")
+     ("o" org-open-at-point "open at point")
+     ("w" org-refile "refile")
+     (", e" (lambda () (interactive) (find-file "~/.emacs.d/modes/org.org")) "edit mode config"))))
+ #+end_src

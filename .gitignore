@@ -1,0 +1,10 @@
+session.*
+\#*
+*.el
+elpa/
+*.log
+transient/
+*~
+.DS_Store
+recentf
+!init.el
