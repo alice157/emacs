@@ -70,6 +70,10 @@ Garbage-collect on focus-out, Emacs /should/ feel snappier.
 (add-hook 'focus-out-hook #'garbage-collect)
 #+END_SRC
 
+Add ~bin to exec-path
+#+BEGIN_SRC emacs-lisp
+  (add-to-list 'exec-path (expand-file-name "~/bin"))
+#+END_SRC
 ** Load =.custom.el=
 
 One is able to use the customization interface that is bundled within Emacs. Ic
@@ -153,7 +157,7 @@ Set font
 #+begin_src emacs-lisp
   (set-face-attribute 'default nil
                       :family "Jetbrains Mono"
-                      :height 130
+                      :height 90
                       :weight 'normal
                       :width 'normal)
 #+end_src
@@ -221,6 +225,15 @@ Ivy for completing all the things
 #+end_src
 
 * Editing
+
+vterm
+#+BEGIN_SRC emacs-lisp
+  (use-package vterm)
+#+END_SRC
+sudo-edit to,,,, edit things with sudo
+#+BEGIN_SRC emacs-lisp
+  (use-package sudo-edit)
+#+END_SRC
 Evil mode for vim vibes
 
 #+BEGIN_SRC emacs-lisp
@@ -484,6 +497,11 @@ Doesn't really work on my dev laptop, but it's not like I typeset stuff there an
 
 #+END_SRC
 
+Web-mode
+#+BEGIN_SRC emacs-lisp
+  (use-package web-mode)
+  (add-to-list 'auto-mode-alist '("\\.html?\\'" . web-mode))
+#+END_SRC
 * Includes
 
 All lisps
