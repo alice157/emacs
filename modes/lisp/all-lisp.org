@@ -72,6 +72,7 @@ Use =evil-cleverparens= to make smartparens play nicer with =evil-mode=.
        (("r" sp-raise-sexp "raise sexp" :color red)
         ("w" sp-wrap-round "wrap sexp" :color red)
         ("W" sp-unwrap-sexp "unwrap sexp" :color red)
+        ("J" sp-join-sexp "join sexp" :color red)
         ("v" (lambda () (interactive) (call-interactively 'sp-select-next-thing) (call-interactively 'evil-backward-char)) "select next thing" :color red))
      "Yank/kill"
        (("d" hydra-lisp-state-kill/body "kill" :color blue)
