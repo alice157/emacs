@@ -28,10 +28,17 @@ Hydras/Cider config
   (use-package clojure-mode)
   (use-package cider
     :after (clojure-mode hydra))
+  (use-package clj-refactor
+    :after cider)
   (require 'cider)
   (require 'clojure-mode)
   (setq clojure-indent-style 'align-arguments)
+  (require 'clj-refactor)
   (setq cider-repl-pop-to-buffer-on-connect 'display-only)
+  (defun clojure-hooks ()
+    (clj-refactor-mode 1)
+    (yas-minor-mode 1))
+  (add-hook 'clojure-mode-hook #'clojure-hooks)
   (major-mode-hydra-define (clojure-mode clojurescript-mode clojurec-mode) (:title "Clojure" :quit-key "q")
     ("REPL"
      (("'" cider-jack-in "jack in clj")

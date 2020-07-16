@@ -15,6 +15,11 @@ Bells are annoying
   (setq visible-bell nil
         ring-bell-function 'ignore)
 #+end_src
+
+Don't ask before killing buffers with running processes
+#+begin_src emacs-lisp
+  (setq confirm-kill-processes nil)
+#+end_src
 Lockfiles don't seem to work well - tragic.
 #+begin_src emacs-lisp
   (setq create-lockfiles nil)
@@ -246,6 +251,7 @@ Evil mode for vim vibes
         evil-move-cursor-back nil)
   (evil-mode)
   :config
+  (evil-define-key 'normal 'global (kbd "U") 'universal-argument)
   ;(key-chord-define evil-insert-state-map "jk" 'evil-normal-state)
 ;  (commend (key-chord-define evil-visual-state-map "jk" 'evil-normal-state))
 )
@@ -279,9 +285,9 @@ Basic file/buffer commands
   (evil-define-key 'normal 'global (kbd "SPC K") 'kill-buffer)
   (evil-define-key 'normal 'global (kbd "SPC f r") 'counsel-recentf)
   (evil-define-key 'normal 'global (kbd "SPC b") 'counsel-switch-buffer)
-  (evil-define-key 'normal 'global (kbd "SPC s p") 'counsel-ag)
+  (evil-define-key 'normal 'global (kbd "SPC s p") (lambda () (interactive) (counsel-ag nil default-directory "--clojure")))
   (evil-define-key 'normal 'global (kbd "SPC s P") (lambda () (interactive) (counsel-ag nil nil "--clojure")))
-  (evil-define-key 'normal 'global (kbd "SPC s s") (lambda () (interactive) (counsel-ag nil default-directory)))
+  (evil-define-key 'normal 'global (kbd "SPC s s") 'counsel-ag)
   (evil-define-key 'normal 'global (kbd "SPC SPC") 'counsel-M-x)
   (evil-define-key 'visual 'global (kbd "SPC SPC") 'counsel-M-x)
   (evil-define-key 'insert 'global (kbd "M-/") 'counsel-company)
@@ -446,12 +452,17 @@ magit and magit-evil for efficiently borking my local git repositories
   (evil-define-key 'normal 'global (kbd "SPC g s") 'magit-status)
   (evil-define-key 'normal 'global (kbd "SPC g f") 'magit-find-file)
   (evil-define-key 'normal 'global (kbd "SPC g b") 'magit-blame)
+  (evil-define-key 'normal 'global (kbd "SPC g d") 'magit-diff)
   (evil-define-key 'normal 'global (kbd "SPC g l") 'github-url-at-point)
+
+  (use-package forge
+    :after magit)
 
   (use-package evil-magit
     :after magit)
 
   (require 'evil-magit)
+
 #+end_src
 
 avy for jumping around
